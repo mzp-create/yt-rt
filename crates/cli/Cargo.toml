@@ -1,0 +1,30 @@
+[package]
+name = "yt-dlp-cli"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "yt-dlp-rs"
+path = "src/main.rs"
+
+[dependencies]
+yt-dlp-core = { workspace = true }
+yt-dlp-extractors = { workspace = true }
+yt-dlp-downloaders = { workspace = true }
+yt-dlp-postprocessors = { workspace = true }
+yt-dlp-networking = { workspace = true }
+
+clap = { workspace = true }
+clap_complete = { workspace = true }
+clap_mangen = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+indicatif = { workspace = true }
+anyhow = { workspace = true }
+reqwest = { workspace = true }
+dirs = { workspace = true }
+toml = { workspace = true }
+shellexpand = { workspace = true }

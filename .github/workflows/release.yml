@@ -1,0 +1,54 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            artifact: yt-dlp-rs-linux-x86_64
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            artifact: yt-dlp-rs-linux-aarch64
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            artifact: yt-dlp-rs-darwin-x86_64
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            artifact: yt-dlp-rs-darwin-aarch64
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            artifact: yt-dlp-rs-windows-x86_64.exe
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+      - name: Install cross-compilation tools
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }} -p yt-dlp-cli
+      - name: Rename binary
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            cp target/${{ matrix.target }}/release/yt-dlp-rs.exe ${{ matrix.artifact }}
+          else
+            cp target/${{ matrix.target }}/release/yt-dlp-rs ${{ matrix.artifact }}
+          fi
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.artifact }}
