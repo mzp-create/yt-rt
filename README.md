@@ -632,4 +632,4 @@ Output file saved to disk
 
 ## License
 
-This project is released under the [Unlicense](https://unlicense.org/). You are free to use, modify, and distribute it without restriction.
+This project is licensed under the [MIT License](LICENSE).
