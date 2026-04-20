@@ -52,6 +52,18 @@ impl PostProcessor for MetadataEmbedPP {
         if let Some(ref url) = info.webpage_url {
             pairs.push(("purl".into(), url.clone()));
         }
+        if let Some(ref channel) = info.channel {
+            pairs.push(("album_artist".into(), channel.clone()));
+        }
+
+        // Extra metadata fields (genre, label, etc.)
+        for (key, value) in &info.extra {
+            if let Some(s) = value.as_str() {
+                if !s.is_empty() {
+                    pairs.push((key.clone(), s.to_string()));
+                }
+            }
+        }
 
         if pairs.is_empty() {
             return Ok(PostProcessorResult {

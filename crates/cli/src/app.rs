@@ -510,8 +510,9 @@ async fn process_video(
     // Pre-post-processing: write sidecar files
     // -----------------------------------------------------------------------
 
-    // --write-thumbnail: download the thumbnail URL to a file next to the video
-    if cli.thumbnail.write_thumbnail {
+    // Download thumbnail if --write-thumbnail or --embed-thumbnail is set.
+    // --embed-thumbnail needs the thumbnail file on disk to embed it.
+    if cli.thumbnail.write_thumbnail || config.postprocessing.embed_thumbnail {
         write_thumbnail(&info, &output_path).await?;
     }
 

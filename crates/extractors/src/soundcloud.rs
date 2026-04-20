@@ -255,6 +255,24 @@ impl InfoExtractor for SoundCloudExtractor {
 
                 let formats = Self::build_formats(client, &data, &client_id).await;
 
+                // Build extra metadata (genre, album, track, etc.)
+                let mut extra = HashMap::new();
+                if let Some(genre) = data["genre"].as_str() {
+                    if !genre.is_empty() {
+                        extra.insert("genre".to_string(), serde_json::Value::String(genre.to_string()));
+                    }
+                }
+                if let Some(label) = data["label_name"].as_str() {
+                    if !label.is_empty() {
+                        extra.insert("label".to_string(), serde_json::Value::String(label.to_string()));
+                    }
+                }
+                if let Some(release_date) = data["release_date"].as_str() {
+                    if !release_date.is_empty() {
+                        extra.insert("release_date".to_string(), serde_json::Value::String(release_date.to_string()));
+                    }
+                }
+
                 let info = InfoDict {
                     id: track_id,
                     title: title.clone(),
@@ -265,10 +283,10 @@ impl InfoExtractor for SoundCloudExtractor {
                     original_url: Some(url.to_string()),
                     display_id: data["permalink"].as_str().map(|s| s.to_string()),
                     description,
-                    uploader,
+                    uploader: uploader.clone(),
                     uploader_id,
                     uploader_url: data["user"]["permalink_url"].as_str().map(|s| s.to_string()),
-                    channel: None,
+                    channel: uploader,
                     channel_id: None,
                     channel_url: None,
                     duration,
@@ -304,7 +322,7 @@ impl InfoExtractor for SoundCloudExtractor {
                     n_entries: None,
                     extractor: "soundcloud".to_string(),
                     extractor_key: "SoundCloud".to_string(),
-                    extra: HashMap::new(),
+                    extra,
                 };
 
                 Ok(ExtractionResult::SingleVideo(Box::new(info)))
